@@ -10,19 +10,19 @@ private:
     int input_dim;
     int iterations;
     float learning_rate;
-
 public:
     ~Perceptron() {
         delete[] W;
     }
     Perceptron(int, int, float);
-    float forward_prop(float x[]);
-    float activation(float x);
-    float getRandom();
-    void printPrediction(float pred[], float y[]);
     void train(float x[][2], float y[], int num_samples);
     float* predict(float x[][2], int num_samples);
     void describe();
+    void printPrediction(float pred[], float y[]);
+private:
+    float forward_prop(float x[]);
+    float activation(float x);
+    float getRandom();
 };
 
 Perceptron::Perceptron(int input_dim, int iterations, float learning_rate) {
@@ -71,11 +71,11 @@ void Perceptron::train(float x[][2], float y[], int num_samples) {
             float ypred = forward_prop(x[i]);
             if (ypred > 0 && y[i] == 0) {
                 for (int k = 0; k < input_dim; k++)
-                    W[k] -=  x[i][k];
+                    W[k] -= learning_rate * x[i][k];
             }
             else if (ypred < 0 && y[i] == 1) {
                 for (int k = 0; k < input_dim; k++)
-                    W[k] += x[i][k];
+                    W[k] += learning_rate * x[i][k];
             }
             else {
                 noChange++;
@@ -101,13 +101,14 @@ void Perceptron::describe() {
     cout << "---------------------\n";
     cout << "Input Dimensions: " << input_dim << endl;
     cout << "Iterations: " << iterations << endl;
-    // cout << "Learning Rate: " << learning_rate << endl;
+    cout << "Learning Rate: " << learning_rate << endl;
     cout << "Weights (W): ";
     for (int i = 0; i < input_dim; i++) {
         cout << "W[" << i << "] = " << W[i] << " ";
     }
     cout << "\nBias (b): " << b << endl;
 }
+
 int main() {
     int num_samples = 4;
     int input_dim = 2;
@@ -115,24 +116,15 @@ int main() {
     // OR gate inputs and outputs
     float or_inputs[4][2] = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
     float or_outputs[4] = {0, 1, 1, 1};
+    
+    Perceptron or_perceptron(input_dim, 100, 0.1);
 
-
-
-
-
-    // Create a Perceptron for the OR gate
-    Perceptron or_perceptron(input_dim, 100, 0.01);
-
-    // Train the Perceptron
     or_perceptron.train(or_inputs, or_outputs, num_samples);
 
-    // Predict using the trained Perceptron
     float* or_predictions = or_perceptron.predict(or_inputs, num_samples);
 
-    // Print the predictions
     or_perceptron.printPrediction(or_predictions, or_outputs);
 
-    // Describe the OR Perceptron
     or_perceptron.describe();
 
     return 0;
